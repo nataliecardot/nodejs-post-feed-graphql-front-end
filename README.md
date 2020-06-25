@@ -1,2 +1,2 @@
-# nodejs-post-feed-graphql-frontend
- Frontend for nodejs-post-feed-graphql
+# nodejs-post-feed-graphql-front-end
+ Front end for nodejs-post-feed-graphql
