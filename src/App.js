@@ -131,7 +131,7 @@ class App extends Component {
         return res.json();
       })
       .then((resData) => {
-        // If there are multiple validation issues, there will be multiple objects (each with a message key) in the data array. But there is only one object in the array (with three propertes: a main message "Invalid input", status, and data with more specific messages)
+        // If there are multiple validation issues, there will be multiple objects (each with message key) in data array. But there is only one object in array (with three propertes: main message "Invalid input", status, and data with more specific messages)
         if (resData.errors && resData.errors[0].status === 422) {
           throw new Error('Validation failed.');
         }
