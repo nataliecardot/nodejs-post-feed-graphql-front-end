@@ -107,7 +107,7 @@ class Signup extends Component {
             touched={this.state.signupForm['password'].touched}
           />
           <Button design="raised" type="submit" loading={this.props.loading}>
-            Signup
+            Sign Up
           </Button>
         </form>
       </Auth>
