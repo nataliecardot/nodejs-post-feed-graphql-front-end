@@ -166,7 +166,9 @@ class Feed extends Component {
       .then((fileResData) => {
         // Setting filePath key in back end post-image endpoint in JSON response after image upload
         // Replacing backslash (first backslash is to escape it) with forward slash since using Windows, which uses backslashes in file paths
-        const imageUrl = fileResData.filePath.replace('\\', '/');
+        const imageUrl = fileResData.filePath
+          ? fileResData.filePath.replace('\\', '/')
+          : undefined;
         let graphqlQuery = {
           query: `
             mutation {
