@@ -166,9 +166,10 @@ class Feed extends Component {
       .then((fileResData) => {
         // Setting filePath key in back end post-image endpoint in JSON response after image upload
         // Replacing backslash (first backslash is to escape it) with forward slash since using Windows, which uses backslashes in file paths
-        const imageUrl = fileResData.filePath
-          ? fileResData.filePath.replace('\\', '/')
-          : undefined;
+        let imageUrl = fileResData.filePath;
+        if (imageUrl) {
+          imageUrl = imageUrl.replace(/\\/g, '/');
+        }
         let graphqlQuery = {
           query: `
             mutation {
@@ -222,23 +223,22 @@ class Feed extends Component {
           throw new Error('Validation failed.');
         }
         if (resData.errors) {
-          throw new Error('User login failed.');
+          throw new Error('Creating or updating post failed.');
         }
+
+        let resDataField = this.state.editPost ? 'editPost' : 'createPost';
         console.log(resData);
-        const {
-          _id,
-          title,
-          content,
-          creator,
-          createdAt,
-        } = resData.data.createPost;
+        // Access property with name of that field on data object
+        const { _id, title, content, creator, createdAt } = resData.data[
+          resDataField
+        ];
         const post = {
           _id,
           title,
           content,
           creator,
           createdAt,
-          imagePath: resData.data.createPost.imageUrl,
+          imagePath: resData.data[resDataField].imageUrl,
         };
         this.setState((prevState) => {
           let updatedPosts = [...prevState.posts];
