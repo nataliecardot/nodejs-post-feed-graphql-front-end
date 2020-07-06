@@ -227,10 +227,7 @@ class Feed extends Component {
         if (resData.errors) {
           throw new Error('User login failed!');
         }
-        let resDataField = 'createPost';
-        if (this.state.editPost) {
-          resDataField = 'updatePost';
-        }
+        const resDataField = this.state.editPost ? 'updatePost' : 'createPost';
         const post = {
           _id: resData.data[resDataField]._id,
           title: resData.data[resDataField].title,
