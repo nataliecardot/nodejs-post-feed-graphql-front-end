@@ -172,26 +172,26 @@ class Feed extends Component {
         }
         let graphqlQuery = {
           query: `
-            mutation {
-              createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}) {
-                _id
-                title
-                content
-                imageUrl
-                creator {
-                  name
-                }
-                createdAt
+          mutation {
+            createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}) {
+              _id
+              title
+              content
+              imageUrl
+              creator {
+                name
               }
+              createdAt
             }
-          `,
+          }
+        `,
         };
 
         if (this.state.editPost) {
           graphqlQuery = {
             query: `
               mutation {
-                updatePost(id: "${this.state.editPost._id}", postInput: { title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}) {
+                updatePost(id: "${this.state.editPost._id}", postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}) {
                   _id
                   title
                   content
@@ -220,24 +220,23 @@ class Feed extends Component {
       })
       .then((resData) => {
         if (resData.errors && resData.errors[0].status === 422) {
-          throw new Error('Validation failed.');
+          throw new Error(
+            "Validation failed. Make sure the email address isn't used yet!"
+          );
         }
         if (resData.errors) {
-          throw new Error('Creating or updating post failed.');
+          throw new Error('User login failed!');
         }
-
-        let resDataField = this.state.editPost ? 'editPost' : 'createPost';
-        console.log(resData);
-        // Access property with name of that field on data object
-        const { _id, title, content, creator, createdAt } = resData.data[
-          resDataField
-        ];
+        let resDataField = 'createPost';
+        if (this.state.editPost) {
+          resDataField = 'updatePost';
+        }
         const post = {
-          _id,
-          title,
-          content,
-          creator,
-          createdAt,
+          _id: resData.data[resDataField]._id,
+          title: resData.data[resDataField].title,
+          content: resData.data[resDataField].content,
+          creator: resData.data[resDataField].creator,
+          createdAt: resData.data[resDataField].createdAt,
           imagePath: resData.data[resDataField].imageUrl,
         };
         this.setState((prevState) => {
