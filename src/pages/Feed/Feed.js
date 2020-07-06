@@ -228,12 +228,15 @@ class Feed extends Component {
           throw new Error('User login failed!');
         }
         const resDataField = this.state.editPost ? 'updatePost' : 'createPost';
+        let { _id, title, content, creator, createdAt } = resData.data[
+          resDataField
+        ];
         const post = {
-          _id: resData.data[resDataField]._id,
-          title: resData.data[resDataField].title,
-          content: resData.data[resDataField].content,
-          creator: resData.data[resDataField].creator,
-          createdAt: resData.data[resDataField].createdAt,
+          _id,
+          title,
+          content,
+          creator,
+          createdAt,
           imagePath: resData.data[resDataField].imageUrl,
         };
         this.setState((prevState) => {
