@@ -278,7 +278,7 @@ class Feed extends Component {
     const graphqlQuery = {
       query: `
         mutation {
-          deletePost(id: "${postId})
+          deletePost(id: "${postId}")
         }
       `,
     };
