@@ -69,8 +69,8 @@ class Feed extends Component {
     }
     const graphqlQuery = {
       query: `
-        {
-          posts(page: ${page}) {
+        query FetchPosts($page: Int) {
+          posts(page: $page) {
             posts {
               _id
               title
@@ -85,6 +85,10 @@ class Feed extends Component {
           }
         }
       `,
+      variables: {
+        // using destructuring -- page: page where first refers to internal variable used in query, second refers to JS variable
+        page,
+      },
     };
     fetch('http://localhost:8080/graphql', {
       method: 'POST',
@@ -119,12 +123,15 @@ class Feed extends Component {
     event.preventDefault();
     const graphqlQuery = {
       query: `
-        mutation {
-          updateStatus(status: "${this.state.status}") {
+        mutation UpdateUserStatus($userStatus: String) {
+          updateStatus(status: $userStatus) {
             status
           }
         }
       `,
+      variables: {
+        userStatus: this.state.status,
+      },
     };
     fetch('http://localhost:8080/graphql', {
       method: 'POST',
@@ -186,14 +193,16 @@ class Feed extends Component {
       .then((fileResData) => {
         // Setting filePath key in back end post-image endpoint in JSON response after image upload
         // Replacing backslash (first backslash is to escape it) with forward slash since using Windows, which uses backslashes in file paths
-        let imageUrl = fileResData.filePath;
+        // image URL is not always set; in updatePost resolver/mutation on back end there's a check that sets image path to provided path only if it's not equal to string undefined (string because of the way it's sent on front end); setting to string as a fallback so it's still set since required as a string either way
+        let imageUrl = fileResData.filePath || 'undefined';
         if (imageUrl) {
           imageUrl = imageUrl.replace(/\\/g, '/');
         }
+        // Variables: Values required in schema (back end) must also be required in front end (i.e., have the exclamation mark after type in both places)
         let graphqlQuery = {
           query: `
-          mutation {
-            createPost(postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}) {
+          mutation CreateNewPost($title: String!, $content: String!, $imageUrl: String!) {
+            createPost(postInput: {title: $title, content: $content, imageUrl: $imageUrl}) {
               _id
               title
               content
@@ -205,13 +214,18 @@ class Feed extends Component {
             }
           }
         `,
+          variables: {
+            title: postData.title,
+            content: postData.content,
+            imageUrl,
+          },
         };
 
         if (this.state.editPost) {
           graphqlQuery = {
             query: `
-              mutation {
-                updatePost(id: "${this.state.editPost._id}", postInput: {title: "${postData.title}", content: "${postData.content}", imageUrl: "${imageUrl}"}) {
+              mutation UpdateExistingPost($postId: ID!, $title: String!, $content: String!, $imageUrl: String!) {
+                updatePost(id: $postId, postInput: {title: $title, content: $content, imageUrl: $imageUrl}) {
                   _id
                   title
                   content
@@ -223,6 +237,12 @@ class Feed extends Component {
                 }
               }
             `,
+            variables: {
+              postId: this.state.editPost._id,
+              title: postData.title,
+              content: postData.content,
+              imageUrl,
+            },
           };
         }
 
