@@ -123,7 +123,7 @@ class Feed extends Component {
     event.preventDefault();
     const graphqlQuery = {
       query: `
-        mutation UpdateUserStatus($userStatus: String) {
+        mutation UpdateUserStatus($userStatus: String!) {
           updateStatus(status: $userStatus) {
             status
           }
@@ -267,7 +267,7 @@ class Feed extends Component {
         if (resData.errors) {
           throw new Error('User login failed!');
         }
-        const resDataField = this.state.editPost ? 'updatePost' : 'createPost';
+        let resDataField = this.state.editPost ? 'updatePost' : 'createPost';
         let { _id, title, content, creator, createdAt } = resData.data[
           resDataField
         ];
